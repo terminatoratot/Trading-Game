@@ -1,0 +1,11 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# The shared leaderboard is local to whoever runs the server
+edge_lab_data/
+
+# OS and editor files
+.DS_Store
+.vscode/
+.idea/

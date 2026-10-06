@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#101813" />
+    <meta name="edge-token" content="__APP_TOKEN__" />
+    <title>Edge Lab · Probability trainer</title>
+    <link rel="stylesheet" href="/static/css/app.css" />
+    <script type="module" src="/static/js/main.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <span class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 17L10 11L14 14L21 5M15 5H21V11" stroke="#d7ef91" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        EDGE LAB<span class="header-sub">Probability. Price. Position.</span>
+      </div>
+      <div class="row header-actions">
+        <span class="pill"><span class="dot"></span>IMAGINARY MONEY</span>
+        <button id="helpBtn" class="small ghost">How it works</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- ============ Setup and dashboard ============ -->
+      <section id="setup">
+        <div class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow">The trading interview practice room</div>
+            <h1>Find the edge.<br />Make the call.</h1>
+            <p>A table of odds. A limited bankroll. Train the probability, judgement and speed behind every bet.</p>
+            <div class="hero-tags">
+              <span>Exact probabilities</span><span>Decision feedback</span><span>Practice built from your mistakes</span>
+            </div>
+          </div>
+          <div class="preview" aria-hidden="true">
+            <div class="preview-top row spread"><span>AT THE PRACTICE TABLE</span><span>01 / 10</span></div>
+            <div class="preview-dice"><div class="die">⚃</div><div class="die">⚄</div></div>
+            <div class="preview-question">The sum is greater than 7.</div>
+            <div class="preview-bottom">
+              <div>TRUE PROBABILITY<strong>41.67%</strong></div>
+              <div>OFFERED PROFIT ODDS<strong>1.80 : 1</strong></div>
+              <div>EV / UNIT<strong>+0.167</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="dashboard"></div>
+
+        <p class="section-label">01 / Choose your session</p>
+        <div class="modes" role="group" aria-label="Practice mode">
+          <button class="mode active" data-mode="coach" aria-pressed="true">
+            <div class="mode-num">01 / LEARN</div>
+            <strong>Coach</strong>
+            <small>Untimed rounds with a hint ladder: a nudge, then the method, then the full walkthrough.</small>
+          </button>
+          <button class="mode" data-mode="interview" aria-pressed="false">
+            <div class="mode-num">02 / EXPLAIN</div>
+            <strong>Interview</strong>
+            <small>Timed rounds. Talk through your reasoning, then review every decision.</small>
+          </button>
+          <button class="mode" data-mode="sprint" aria-pressed="false">
+            <div class="mode-num">03 / EXECUTE</div>
+            <strong>Sprint</strong>
+            <small>One session clock. Complete as many considered rounds as you can.</small>
+          </button>
+          <button class="mode" data-mode="practice" aria-pressed="false">
+            <div class="mode-num">04 / TARGET</div>
+            <strong>Targeted practice</strong>
+            <small>Boards built from your past mistakes: weak topics, biased ranges and the prices that fool you.</small>
+          </button>
+          <button class="mode" data-mode="drill" aria-pressed="false">
+            <div class="mode-num">05 / SPEED</div>
+            <strong>Pricing drill</strong>
+            <small>Quick-fire probabilities against the clock. No odds, no stakes, just streaks.</small>
+          </button>
+          <button class="mode" data-mode="room" aria-pressed="false">
+            <div class="mode-num">06 / COMPETE</div>
+            <strong>Multiplayer</strong>
+            <small>Play live with friends: same boards, one shared roll, live leaderboard.</small>
+          </button>
+          <a class="mode mode-link" href="/trading">
+            <div class="mode-num">07 / MARKET ↗</div>
+            <strong>Trading game</strong>
+            <small>Make markets and trade a hidden hand of cards against three bots, with market events by difficulty.</small>
+          </a>
+        </div>
+
+        <p class="section-label">02 / Set the conditions</p>
+        <form id="configForm" class="config">
+          <div id="practiceNote" class="practice-note hidden"></div>
+          <div class="config-grid">
+            <div class="field">
+              <label for="difficulty">Difficulty</label>
+              <select id="difficulty">
+                <option value="easy">Easy · simple counting, clear edges</option>
+                <option value="medium" selected>Medium · interview-style questions</option>
+                <option value="hard">Hard · puzzles, narrow edges</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="topic">Events</label>
+              <select id="topic">
+                <option value="mixed">Mixed table</option>
+                <option value="dice">Dice only</option>
+                <option value="cards">Cards only</option>
+                <option value="coins">Coins only</option>
+                <option value="puzzles">Puzzles only</option>
+              </select>
+            </div>
+            <div class="field" data-for="coach interview sprint practice room">
+              <label for="bankroll">Starting bankroll (units)</label>
+              <input id="bankroll" type="number" min="10" max="1000000" step="0.01" value="1000" required />
+            </div>
+            <div class="field" data-for="coach interview practice room">
+              <label for="rounds">Number of rounds</label>
+              <select id="rounds">
+                <option value="5">5 rounds</option>
+                <option value="10" selected>10 rounds</option>
+                <option value="20">20 rounds</option>
+                <option value="50">50 rounds</option>
+              </select>
+            </div>
+            <div class="field" data-for="interview room">
+              <label for="seconds">Seconds per round</label>
+              <select id="seconds">
+                <option value="0" class="room-only">No time limit</option>
+                <option value="30">30 seconds</option>
+                <option value="60" selected>60 seconds</option>
+                <option value="90">90 seconds</option>
+                <option value="120">120 seconds</option>
+                <option value="150">150 seconds</option>
+              </select>
+            </div>
+            <div class="field" data-for="sprint">
+              <label for="minutes">Session length</label>
+              <select id="minutes">
+                <option value="5">5 minutes</option>
+                <option value="10" selected>10 minutes</option>
+                <option value="15">15 minutes</option>
+                <option value="20">20 minutes</option>
+              </select>
+            </div>
+            <div class="field" data-for="drill">
+              <label for="drillLength">Drill length</label>
+              <select id="drillLength">
+                <option value="60">1 minute</option>
+                <option value="120" selected>2 minutes</option>
+                <option value="180">3 minutes</option>
+                <option value="300">5 minutes</option>
+              </select>
+            </div>
+            <div class="field check-field" data-for="drill">
+              <label><input type="checkbox" id="drillTargeted" /> Focus on my weak spots</label>
+            </div>
+            <div class="field" data-for="room">
+              <label for="playerName">Your name</label>
+              <input id="playerName" maxlength="20" autocomplete="nickname" placeholder="Shown to other players" />
+            </div>
+            <div class="field" data-for="coach interview sprint">
+              <label for="seed">Replay seed <span class="muted">(optional)</span></label>
+              <input id="seed" maxlength="80" placeholder="Random each session" autocomplete="off" />
+            </div>
+          </div>
+          <div class="config-foot">
+            <p id="configHint">All money is imaginary. One shared roll or draw settles the whole board. You may bet on several events, or pass on every event.</p>
+            <button class="primary" id="startBtn" type="submit">Start session ↗</button>
+          </div>
+        </form>
+
+        <div id="joinPanel" class="config join hidden">
+          <div class="join-row">
+            <div class="field">
+              <label for="joinCode">Joining a friend? Enter their room code</label>
+              <input id="joinCode" maxlength="4" placeholder="e.g. KQZX" autocomplete="off" spellcheck="false" />
+            </div>
+            <button id="joinBtn" type="button">Join room ↗</button>
+          </div>
+          <p class="tiny muted">Joining uses the name above. The host's settings apply to everyone.</p>
+        </div>
+
+        <div class="setup-extras">
+          <details>
+            <summary>The 30-second briefing</summary>
+            <p>Odds b:1 mean a winning stake of 1 earns b profit plus your original stake back. A loss costs the stake.</p>
+            <div class="formula">EV per unit = p × b − (1 − p)</div>
+            <p>Positive EV when p &gt; 1/(b+1). Estimate p, compare it with the price, choose a stake, then settle. Do not judge a decision from one outcome.</p>
+          </details>
+          <details>
+            <summary>What to practise saying aloud</summary>
+            <p>“The probability is approximately __. The break-even probability is __. My edge is __ per unit. I will stake __ because __. These bets share the same outcome, so my combined exposure is __.”</p>
+            <p>Coach offers hints before you commit. Every other mode reveals answers only after you lock your bets.</p>
+          </details>
+        </div>
+
+        <div id="savedHistory" class="session-history"></div>
+      </section>
+
+      <!-- ============ A betting board (all modes except the drill) ============ -->
+      <section id="play" class="hidden">
+        <div class="session-top">
+          <div>
+            <span class="eyebrow muted" id="sessionLabel">SESSION</span>
+            <h2 id="sessionTitle">Read the board.</h2>
+          </div>
+          <div class="row">
+            <span class="pill" id="seedPill"></span>
+            <button id="endBtn" class="ghost">End session</button>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span>Bankroll</span><strong id="bankStat">1,000</strong><small>Imaginary units</small></div>
+          <div class="stat"><span>Realised P&amp;L</span><strong id="pnlStat">0</strong><small>What happened</small></div>
+          <div class="stat"><span>Cumulative EV</span><strong id="evStat">0</strong><small>Expected profit of your bets</small></div>
+          <div class="stat"><span id="fourthLabel">Round</span><strong id="roundStat">1 / 10</strong><small id="fourthSmall">Price each event independently</small></div>
+        </div>
+        <div class="arena">
+          <div class="board">
+            <div id="roundView">
+              <div class="board-intro">
+                <div>
+                  <div class="eyebrow muted" id="familyLabel">DICE</div>
+                  <h3 id="boardTitle">Two dice</h3>
+                  <p id="boardRules"></p>
+                  <div class="board-graphic" id="boardGraphic" aria-hidden="true"></div>
+                </div>
+                <div class="timer" id="timer" aria-label="Time remaining">∞</div>
+              </div>
+              <p id="focusNote" class="focus-note hidden"></p>
+              <div id="events"></div>
+              <div id="validation" class="warning hidden" role="alert"></div>
+              <div id="roomWait" class="room-wait hidden" role="status"></div>
+              <div class="submit-bar">
+                <button id="clearBtn" class="ghost">Clear stakes</button>
+                <span class="keyboard"><kbd>1</kbd>–<kbd>4</kbd> select stake · <kbd>Enter</kbd> lock</span>
+                <button id="settleBtn" class="primary">Lock bets &amp; reveal ↗</button>
+              </div>
+            </div>
+            <div id="reviewView" class="hidden"></div>
+          </div>
+          <aside class="sidebar">
+            <div class="side-card white hidden" id="roomCard">
+              <h3 id="roomCardTitle">Leaderboard</h3>
+              <div id="roomBoard"></div>
+            </div>
+            <div class="side-card">
+              <h3>Your exposure</h3>
+              <div class="side-item"><span>Committed</span><strong class="mono" id="committed">0</strong></div>
+              <div class="side-item"><span>Kept in cash</span><strong class="mono" id="cash">1,000</strong></div>
+              <div class="meter"><div id="stakeMeter"></div></div>
+              <p id="exposureNote">Unstaked money stays in your bankroll.</p>
+            </div>
+            <div class="side-card white">
+              <h3>Read the odds</h3>
+              <p><strong>b : 1</strong> means b profit on a winning 1-unit stake.</p>
+              <div class="formula">Break-even p = 1/(1+b)</div>
+              <p>At 1.5 : 1, you need a probability above 40% for positive expected value.</p>
+            </div>
+            <div class="side-card white">
+              <h3>Think out loud</h3>
+              <p>Probability → break-even → edge → stake → combined risk.</p>
+              <p class="tiny">All bets on this board settle on the same outcome. Four bets can still be one concentrated position.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ Pricing drill ============ -->
+      <section id="drill" class="hidden">
+        <div class="session-top">
+          <div>
+            <span class="eyebrow muted" id="drillLabel">PRICING DRILL</span>
+            <h2>Price it fast.</h2>
+          </div>
+          <button id="drillEnd" class="ghost">End drill</button>
+        </div>
+        <div class="stats">
+          <div class="stat"><span>Time left</span><strong id="drillClock">2:00</strong><small id="drillTolerance">Within ±5 points counts</small></div>
+          <div class="stat"><span>Correct</span><strong id="drillScore">0 / 0</strong><small>Answers in range</small></div>
+          <div class="stat"><span>Streak</span><strong id="drillStreak">0</strong><small id="drillBest">Best 0</small></div>
+          <div class="stat"><span>Last miss</span><strong id="drillLast">–</strong><small>Points from the truth</small></div>
+        </div>
+        <div class="drill-grid">
+          <div class="drill-card">
+            <div class="eyebrow muted" id="drillFamily"></div>
+            <h3 id="drillTitle"></h3>
+            <p id="drillRules" class="muted"></p>
+            <div class="board-graphic" id="drillGraphic" aria-hidden="true"></div>
+            <p id="drillFocus" class="focus-note hidden"></p>
+            <div class="drill-question" id="drillQuestion"></div>
+            <form id="drillForm" class="drill-form">
+              <input id="drillInput" placeholder="40 or 5/12" autocomplete="off" aria-label="Your probability" />
+              <button class="primary" type="submit">Answer ↵</button>
+            </form>
+            <div class="parsed tiny" id="drillParsed"></div>
+          </div>
+          <div id="drillFeedback" class="drill-feedback">
+            <p class="muted">Type a percentage or a fraction and press Enter. Feedback on each answer appears here while the next question is already waiting.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Multiplayer lobby ============ -->
+      <section id="lobby" class="hidden">
+        <div class="session-top">
+          <div>
+            <span class="eyebrow muted">MULTIPLAYER / LOBBY</span>
+            <h2>Room <span class="mono" id="lobbyCode"></span></h2>
+            <p class="muted" id="lobbyInfo"></p>
+          </div>
+          <button id="leaveBtn" class="ghost">Leave room</button>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-panel">
+            <h3>Invite your friends</h3>
+            <p class="tiny muted">Send this link, or tell them the room code.</p>
+            <div class="copy-row">
+              <input id="lobbyLink" readonly /><button id="copyLink" class="small">Copy link</button>
+            </div>
+            <p class="tiny" id="linkNote"></p>
+          </div>
+          <div class="summary-panel">
+            <h3>Players <span class="muted" id="lobbyCount"></span></h3>
+            <div id="lobbyPlayers"></div>
+            <div id="lobbyAction" class="lobby-action"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="summaryView" class="hidden"></section>
+    </main>
+
+    <footer>
+      <span>EDGE LAB / An original interview practice tool</span>
+      <span>Exact enumeration · Imaginary bankroll · No account</span>
+    </footer>
+    <div id="toast" class="toast hidden" role="status"></div>
+
+    <dialog id="helpDialog">
+      <div class="row spread">
+        <h2>Know the rules.</h2>
+        <button id="closeHelp" class="small">Close</button>
+      </div>
+      <p>Each board states its own rules at the top: read them, because some boards add a clue or use unusual dice. Unless a board says otherwise, dice are fair, six-sided and independent, and coins are fair. Cards come from a fresh, standard 52-card deck each round, without replacement. A=1, J=11, Q=12, K=13; face cards are J, Q, K.</p>
+      <ul>
+        <li>Enter a probability for every proposition, as a percentage such as 41.67 or a fraction such as 5/12, and a stake in units. An estimate counts as correct when it is within ±10, ±5 or ±2 percentage points of the true probability on Easy, Medium or Hard.</li>
+        <li>Sum of stakes cannot exceed the bankroll. Zero or blank means pass.</li>
+        <li>Quoted odds are profit odds. Win: stake × odds in profit. Lose: minus your stake.</li>
+        <li>Interview countdown locks your entered bets automatically. Sprint's clock continues during review. Late submissions beyond a 2-second transport allowance are passed.</li>
+        <li>All propositions on a board use one shared outcome. Different rounds are fresh draws.</li>
+        <li>Coach: open hints one step at a time. Answers you give after opening the full walkthrough are left out of your pattern analysis.</li>
+        <li>Targeted practice and the targeted drill read your answer history in this browser, find your patterns (biased ranges, weak topics, overpriced buys, missed edges, bet sizing) and deal boards that test them.</li>
+        <li>Multiplayer: the host creates a room and shares its link or 4-letter code. Everyone plays the same boards and the same roll, and bets stay private until the round closes.</li>
+      </ul>
+      <div class="formula">Single-bet Kelly = max(0, [p(b+1)−1]/b)</div>
+      <p>Kelly maximises expected log wealth for an isolated bet. The review's suggested stakes use half of the exact joint Kelly amount, which accounts for bets sharing one outcome.</p>
+      <p>Final P&amp;L depends on luck. Track expected profit, money put into negative-EV bets, and probability-estimate error. Passing can be sensible, including when an edge is too uncertain.</p>
+      <p>Your history is saved in this browser only. Sessions you end early are not counted. Restarting the server clears sessions in progress.</p>
+    </dialog>
+  </body>
+</html>

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#1e1b1a" />
+    <meta name="edge-token" content="__APP_TOKEN__" />
+    <title>Trading Game · Edge Lab</title>
+    <link rel="stylesheet" href="/static/vendor/katex/katex.min.css" />
+    <link rel="stylesheet" href="/static/css/trading.css" />
+    <script defer src="/static/vendor/katex/katex.min.js"></script>
+    <script type="module" src="/static/js/trading.js"></script>
+  </head>
+  <body class="tg">
+    <nav class="tg-nav"><a href="/">← EDGE LAB</a><span>MARKET GAMES</span></nav>
+
+    <main class="tg-main">
+      <!-- ============ Settings, statistics and leaderboard ============ -->
+      <section id="tgSetup">
+        <div class="tg-kicker">MARKET MAKING</div>
+        <h1 class="tg-title">Trading Game</h1>
+        <p class="tg-lede">
+          Quote markets and trade a partially hidden hand of cards against three bots, rotational or open outcry market
+          making. Maximise your expected profit over a series of rounds.
+        </p>
+
+        <details class="tg-panel tg-howto" id="tgHowTo" open>
+          <summary><h2>How to Play</h2></summary>
+          <p>Each round you see a set of cards worth 2 to 14, with the ace worth 14. Some are face up and the rest face down.
+            When the round ends every card is turned over, and the sum of their values is the market price.</p>
+          <div class="tg-values" aria-label="Card values">
+            <div class="tg-value-row" id="tgValueRow"></div>
+            <div class="tg-value-caption">Card values</div>
+          </div>
+          <div class="tg-howto-grid">
+            <div><h3>Market maker quote</h3><p>A quote reads <b>X at Y</b>. X is the bid, the price the market maker
+              will buy at; Y is the ask, the price it will sell at. The gap is the spread.</p></div>
+            <div><h3>Market making modes</h3><p><b>Rotational:</b> each round another player quotes the market.
+              <b>Open outcry:</b> everyone shouts a quote at once and the first valid quote becomes the market maker.</p></div>
+            <div><h3>Time to trade</h3><p>Choose how many units to trade, then buy at the ask or sell at the bid. Offers
+              only last a limited time, so act quickly.</p></div>
+            <div><h3>Valid orders</h3><p>You must be able to afford any long position from your balance (units × ask), and
+              your balance must cover the largest possible loss on a short (units × (highest possible value − bid)).</p></div>
+            <div><h3>Outcome</h3><p>Buyers make the market price minus the ask on each unit; sellers make the bid minus the
+              market price. The market maker takes the other side of every trade.</p></div>
+            <div><h3>Track your position</h3><p>After each round you report your return. On Hard your balance is hidden:
+              keep it in your head and report it at the end.</p></div>
+          </div>
+        </details>
+
+        <div class="tg-setup">
+          <form id="tgForm" class="tg-panel">
+            <h2>Settings</h2>
+            <div class="tg-label">GAME DIFFICULTY</div>
+            <div class="tg-segment" role="radiogroup" aria-label="Game difficulty">
+              <button type="button" data-diff="easy">Easy</button>
+              <button type="button" data-diff="medium">Medium</button>
+              <button type="button" data-diff="hard">Hard</button>
+              <button type="button" data-diff="custom">Custom</button>
+            </div>
+            <p class="tg-note" id="tgDiffNote"></p>
+
+            <label class="tg-label" for="tgMode">MARKET MAKING MODE</label>
+            <select id="tgMode" class="tg-select">
+              <option value="rotational">Rotational</option>
+              <option value="outcry">Open outcry</option>
+              <option value="maker">You make every market</option>
+              <option value="taker">You trade, bots make markets</option>
+            </select>
+
+            <div class="tg-tiles">
+              <label class="tg-tile custom-only"><span>Market event level</span>
+                <select id="tgTier"><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></label>
+              <label class="tg-tile"><span>Number of cards</span>
+                <select id="tgCards"><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+              <label class="tg-tile"><span>Cards face up</span>
+                <select id="tgShown"><option>0</option><option>1</option><option>2</option><option>3</option></select></label>
+              <label class="tg-tile"><span>Number of rounds</span>
+                <select id="tgRounds"><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option></select></label>
+              <label class="tg-tile"><span>Time to answer</span>
+                <select id="tgSeconds"><option value="10">10s</option><option value="15">15s</option><option value="20">20s</option><option value="30">30s</option><option value="60">60s</option><option value="0">No clock</option></select></label>
+              <label class="tg-tile"><span>Min spread</span>
+                <select id="tgMin"><option value="1">1 pt</option><option value="2">2 pts</option><option value="3">3 pts</option><option value="4">4 pts</option></select></label>
+              <label class="tg-tile"><span>Max spread</span>
+                <select id="tgMax"><option value="3">3 pts</option><option value="4">4 pts</option><option value="5">5 pts</option><option value="6">6 pts</option><option value="8">8 pts</option><option value="10">10 pts</option></select></label>
+              <label class="tg-tile"><span>Starting budget</span>
+                <select id="tgBudget"><option value="500">500</option><option value="1000">1,000</option><option value="2000">2,000</option></select></label>
+              <label class="tg-tile"><span>Show balance</span>
+                <select id="tgShow"><option value="on">On</option><option value="off">Off · track it yourself</option></select></label>
+              <label class="tg-tile"><span>Enable market events</span>
+                <select id="tgEvents"><option value="on">On</option><option value="off">Off</option></select></label>
+              <label class="tg-tile"><span>P&amp;L check</span>
+                <select id="tgCheck"><option value="on">On</option><option value="off">Off</option></select></label>
+              <label class="tg-tile"><span>Leaderboard name</span>
+                <input id="tgName" maxlength="20" placeholder="Optional" autocomplete="nickname" /></label>
+            </div>
+            <button class="tg-btn tg-start" type="submit" id="tgStart">Start Game</button>
+          </form>
+
+          <div class="tg-side">
+            <div class="tg-panel">
+              <h2>Statistics</h2>
+              <div class="tg-stat-row" id="tgStats"></div>
+              <div class="tg-toggle" role="radiogroup" aria-label="Chart view">
+                <button type="button" data-view="last" class="on">Last 10</button>
+                <button type="button" data-view="daily">Daily avg</button>
+              </div>
+              <div id="tgChart" class="tg-chart"></div>
+            </div>
+            <div class="tg-panel">
+              <div class="tg-row"><h2>Leaderboard</h2><span class="tg-label">LAST 30 DAYS</span></div>
+              <div id="tgLeaders"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ The table ============ -->
+      <section id="tgGame" class="hidden">
+        <div class="tg-board">
+          <div class="tg-round" id="tgRound">ROUND 1</div>
+          <div class="tg-players" id="tgPlayers"></div>
+          <div class="tg-felt">
+            <div class="tg-event hidden" id="tgEventChip"></div>
+            <div class="tg-cards" id="tgHand"></div>
+          </div>
+          <div class="tg-info" id="tgInfo"></div>
+          <div class="tg-action" id="tgAction"></div>
+          <div class="tg-foot"><span id="tgClock" class="tg-clock"></span><span>Budget: <b id="tgBank"></b></span></div>
+        </div>
+        <button class="tg-link" id="tgQuit">End game</button>
+      </section>
+
+      <!-- ============ Market closed ============ -->
+      <section id="tgFinal" class="hidden"></section>
+    </main>
+
+    <div id="tgModal" class="tg-modal hidden" role="dialog" aria-modal="true" aria-labelledby="tgModalTitle">
+      <div class="tg-dialog">
+        <h3 id="tgModalTitle">Market Event!</h3>
+        <div class="tg-warn"><span aria-hidden="true">⚠</span><span id="tgModalText"></span></div>
+        <div class="tg-dialog-foot"><button class="tg-btn" id="tgBegin">Start round</button></div>
+      </div>
+    </div>
+    <div id="toast" class="toast hidden" role="status"></div>
+  </body>
+</html>
